@@ -17,15 +17,12 @@ class AuthController {
             if (!valid) return res.status(400).json(errorResponse(errors[0], 'VALIDATION_ERROR'));
 
             const { firstname, lastname, email, password } = data;
-
+            console.log(data)
             const userExist = await User.findOne({ email });
             if (userExist) return res.status(400).json(errorResponse('User already exists', 'USER_EXISTS'));
 
             const salt = await bcrypt.genSalt(10);
             const hashedPassword = await bcrypt.hash(password, salt);
-
-            const defaultRole = await Role.findOne({ name: 'user' });
-            if (!defaultRole) return res.status(500).json(errorResponse('Internal Server Error', 'SERVER_ERROR'));
 
             const user = await User.create({ firstname, lastname, email, password: hashedPassword, salt, role: defaultRole._id });
 
